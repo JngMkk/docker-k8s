@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-pvc-deploy
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nfs-pvc-deploy
+  template:
+    metadata:
+      labels:
+        app: nfs-pvc-deploy
+    spec:
+      containers:
+        # audit-trail 이미지를 가져옴.
+        # 해당 컨테이너 이미지는 요청을 처리할 때 마다 접속 정보를 로그로 기록함
+      - name: audit-trail
+        image: sysnet4admin/audit-trail
+        # 볼륨이 마운트될 위치로 /audit 지정
+        volumeMounts:
+        - name: nfs-vol
+          mountPath: /audit
+      # PVC로 생성된 볼륨을 마운트하기 위해서 nfs-pvc라는 이름을 사용
+      volumes:
+      - name: nfs-vol
+        persistentVolumeClaim:
+          claimName: nfs-pvc
